@@ -15,7 +15,7 @@ function Login() {
 		setError('');
 		try {
 			await signIn(email, password);
-			navigate('/cv-project/home');
+			navigate('/home');
 		} catch (err) {
 			setError(err.message);
 		}
@@ -24,7 +24,7 @@ function Login() {
 		e.preventDefault();
 		try {
 			await googleSignIn();
-			navigate('/cv-project/home');
+			navigate('/home');
 		} catch (err) {
 			setError(err.message);
 		}
@@ -59,7 +59,7 @@ function Login() {
 					</div>
 				</Form>
 				<div className='mt-2'>
-					<Link to='/cv-project/password-reset'>Forgot Password</Link>
+					<Link to='/password-reset'>Forgot Password</Link>
 				</div>
 				<hr />
 				<div>
@@ -71,7 +71,7 @@ function Login() {
 				</div>
 			</div>
 			<div className='p-4 box mt-3 text-center'>
-				Don't have an account? <Link to='/cv-project/signup'>Sign Up</Link>
+				Don't have an account? <Link to='/signup'>Sign Up</Link>
 			</div>
 		</div>
 	);

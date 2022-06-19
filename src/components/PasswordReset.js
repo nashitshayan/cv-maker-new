@@ -28,7 +28,7 @@ function PasswordReset() {
 					<h5>Password reset mail sent!</h5>
 					<small>(Check in your spam folder if you don't find it.)</small>
 					<div className=' mt-3'>
-						<Link to='/cv-project/'>Proceed to Log In</Link>
+						<Link to='/'>Proceed to Log In</Link>
 					</div>
 				</div>
 			) : (
@@ -54,7 +54,7 @@ function PasswordReset() {
 						<hr />
 					</div>
 					<div className='p-4 box mt-3 text-center'>
-						Don't have an account? <Link to='/cv-project/signup'>Sign Up</Link>
+						Don't have an account? <Link to='/signup'>Sign Up</Link>
 					</div>
 				</>
 			)}

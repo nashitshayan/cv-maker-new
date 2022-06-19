@@ -10,11 +10,11 @@ function App() {
 	return (
 		<div>
 			<Routes>
-				<Route path='/cv-project' element={<Login />} />
-				<Route path='/cv-project/signup' element={<SignUp />} />
-				<Route path='/cv-project/password-reset' element={<PasswordReset />} />
+				<Route path='/' element={<Login />} />
+				<Route path='/signup' element={<SignUp />} />
+				<Route path='/password-reset' element={<PasswordReset />} />
 				<Route
-					path='/cv-project/home'
+					path='/home'
 					element={
 						<ProtectedRoute>
 							<Home />
