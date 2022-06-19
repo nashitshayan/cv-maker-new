@@ -57,6 +57,22 @@ li {
 	list-style: square;
 }
 
+.app-title {
+	background-color: var(--clr--secondary);
+	width: 100%;
+	text-align: center;
+	font-size: 2rem;
+	font-weight: bold;
+	padding: 1rem;
+}
+.app-wrapper {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+}
+
 .cv-wrapper {
 	width: min(90%, 50em);
 	margin-inline: auto;
@@ -390,8 +406,9 @@ header input {
 
 footer {
 	width: 100%;
-	font-size: 1.2rem;
-	padding: 1.5em;
+	font-size: 1.1rem;
+	margin-top: 1rem;
+	padding: 1em;
 	background-color: var(--clr--secondary);
 	text-align: center;
 }
@@ -431,13 +448,14 @@ footer a {
 		z-index: 10;
 	}
 	.sticky + .outer-wrapper {
-		padding-top: 19.5em;
+		padding-top: 13em;
 	}
 }
 
 /* FOR PRINTING */
 
 @media print {
+	.app-title,
 	.toggle-btns-wrapper,
 	footer {
 		display: none;
@@ -562,15 +580,7 @@ ul.icon li {
 }
 
 /*  auth related */
-.auth-wrapper {
-	margin-inline: auto;
-	background-color: var(--clr--primary);
-	display: flex;
-	justify-content: center;
-	flex-direction: column;
-	align-items: center;
-	height: 100vh;
-}
+
 .auth-wrapper a {
 	color: var(--clr--neutral);
 }
