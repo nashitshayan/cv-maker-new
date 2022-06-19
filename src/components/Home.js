@@ -2,15 +2,12 @@ import '../css/App.css';
 import { useState, useEffect } from 'react';
 import EditableCV from './EditCV/EditableCV';
 import PreviewCV from './DisplayCV/PreviewCV';
-import Footer from './Footer';
 import { db } from '../firebase';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { useDebounce } from '../useDebounce';
 import { useUserAuth } from '../context/UserAuthContext';
 function Home() {
 	const { user, logOut } = useUserAuth();
-	//console.log('uid', user.uid);
-	//localStorage.clear();
 
 	//get isEdit from localstorage, if not available then set initial value
 	const getInitialIsEdit = () => {
@@ -20,7 +17,6 @@ function Home() {
 
 	//get realtime db data
 	useEffect(() => {
-		//doc(db, 'users', user.uid, 'CV-Data', docName)
 		onSnapshot(doc(db, 'users', user.uid, 'CV-Data', 'headerData'), (doc) => {
 			const fetchedHeaderData = { ...initialHeaderData, ...doc.data() };
 			setHeaderData(fetchedHeaderData);
@@ -537,7 +533,6 @@ function Home() {
 	return (
 		<div className='cv-wrapper'>
 			<div className='toggle-btns-wrapper'>
-				<h1>CV-Maker</h1>
 				<button onClick={editHandler} className='btn-cv-toggle'>
 					Edit
 				</button>
@@ -591,8 +586,6 @@ function Home() {
 					projectData={projectData}
 				/>
 			)}
-
-			<Footer />
 		</div>
 	);
 }

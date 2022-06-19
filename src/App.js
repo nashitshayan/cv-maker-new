@@ -4,11 +4,13 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import PasswordReset from './components/PasswordReset';
 import Home from './components/Home';
+import Title from './components/Title';
+import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 function App() {
-	console.log('from app');
 	return (
-		<div>
+		<div className='app-wrapper'>
+			<Title />
 			<Routes>
 				<Route path='/' element={<Login />} />
 				<Route path='/signup' element={<SignUp />} />
@@ -22,6 +24,7 @@ function App() {
 					}
 				/>
 			</Routes>
+			<Footer />
 		</div>
 	);
 }

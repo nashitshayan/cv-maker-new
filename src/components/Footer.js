@@ -5,12 +5,18 @@ function Footer() {
 		<footer>
 			<div>
 				Made by
-				<a href='https://github.com/nashitshayan' target='_blank'>
+				<a
+					href='https://github.com/nashitshayan'
+					target='_blank'
+					rel='noreferrer'>
 					{' '}
 					Nashit Shayan Khan{' '}
 				</a>
 				. Click
-				<a href='https://github.com/nashitshayan/cv-project' target='_blank'>
+				<a
+					href='https://github.com/nashitshayan/cv-maker-new'
+					target='_blank'
+					rel='noreferrer'>
 					{' '}
 					here{' '}
 				</a>
@@ -20,7 +26,8 @@ function Footer() {
 				Design taken from{' '}
 				<a
 					href='https://www.goodcv.com/images/cv/screenshots/thumbs/en/outstanding_10.png?v=1.0.1'
-					target='_blank'>
+					target='_blank'
+					rel='noreferrer'>
 					here
 				</a>
 			</div>
