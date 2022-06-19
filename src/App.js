@@ -6,6 +6,7 @@ import PasswordReset from './components/PasswordReset';
 import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
 function App() {
+	console.log('from app');
 	return (
 		<div>
 			<Routes>
