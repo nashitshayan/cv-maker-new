@@ -1,242 +1,129 @@
-import '../css/App.css';
 import { useState, useEffect } from 'react';
 import EditableCV from './EditCV/EditableCV';
 import PreviewCV from './DisplayCV/PreviewCV';
-import { db } from '../firebase';
-import { doc, setDoc, onSnapshot } from 'firebase/firestore';
-import { useDebounce } from '../useDebounce';
-import { useUserAuth } from '../context/UserAuthContext';
-function Home() {
-	const { user, logOut } = useUserAuth();
+import '../css/App.css';
 
+const initialHeaderData = { name: '', title: '' };
+
+const initialPersonalData = {
+	gender: '',
+	dateOfBirth: '',
+	phone: '',
+	email: '',
+	website: '',
+	location: '',
+};
+const initialSkillsData = [
+	{
+		title: '',
+		skills: [
+			{
+				skillName: '',
+			},
+		],
+	},
+];
+
+const initialObjectiveData = {
+	summary: '',
+};
+
+const initialEducationData = [
+	{
+		institute: '',
+		course: '',
+		startDate: '',
+		endDate: '',
+		isCurrentlyStudying: false,
+		result: '',
+	},
+];
+
+const initialExperienceData = [
+	{
+		company: '',
+		title: '',
+		startDate: '',
+		endDate: '',
+		isCurrentlyWorking: false,
+		summary: '',
+	},
+];
+
+const initialProjectData = [
+	{
+		title: '',
+		startDate: '',
+		endDate: '',
+		isCurrentlyWorking: false,
+		summary: '',
+	},
+];
+
+function Home() {
 	//get isEdit from localstorage, if not available then set initial value
 	const getInitialIsEdit = () => {
 		const isEditFromLocalStorage = JSON.parse(localStorage.getItem('isEdit'));
 		return isEditFromLocalStorage !== null ? isEditFromLocalStorage : true;
 	};
 
-	//get realtime db data
-	useEffect(() => {
-		onSnapshot(doc(db, 'users', user.uid, 'CV-Data', 'headerData'), (doc) => {
-			const fetchedHeaderData = { ...initialHeaderData, ...doc.data() };
-			setHeaderData(fetchedHeaderData);
-		});
-		onSnapshot(doc(db, 'users', user.uid, 'CV-Data', 'personalData'), (doc) => {
-			const fetchedPersonalData = { ...initialPersonalData, ...doc.data() };
-			setPersonalData(fetchedPersonalData);
-		});
-		onSnapshot(doc(db, 'users', user.uid, 'CV-Data', 'skillsData'), (doc) => {
-			const fetchedSkillslData = doc.data()
-				? doc.data().skillsData
-				: initialSkillsData;
-			setSkillsData(fetchedSkillslData);
-		});
-		onSnapshot(
-			doc(db, 'users', user.uid, 'CV-Data', 'objectiveData'),
-			(doc) => {
-				const fetchedObjectiveData = { ...initialObjectiveData, ...doc.data() };
-				setObjectiveData(fetchedObjectiveData);
-			},
-		);
-		onSnapshot(
-			doc(db, 'users', user.uid, 'CV-Data', 'educationData'),
-			(doc) => {
-				const fetchedEducationlData = doc.data()
-					? doc.data().educationData
-					: initialEducationData;
-				setEducationData(fetchedEducationlData);
-			},
-		);
-		onSnapshot(
-			doc(db, 'users', user.uid, 'CV-Data', 'experienceData'),
-			(doc) => {
-				const fetchedExperiencelData = doc.data()
-					? doc.data().experienceData
-					: initialExperienceData;
-				setExperienceData(fetchedExperiencelData);
-			},
-		);
-		onSnapshot(doc(db, 'users', user.uid, 'CV-Data', 'projectData'), (doc) => {
-			const fetchedProjectlData = doc.data()
-				? doc.data().projectData
-				: initialProjectData;
-			setProjectData(fetchedProjectlData);
-		});
-	}, []);
-
 	// setting initial states
-	const initialHeaderData = { name: '', title: '' };
 	const [headerData, setHeaderData] = useState(initialHeaderData);
-	const initialPersonalData = {
-		gender: '',
-		dateOfBirth: '',
-		phone: '',
-		email: '',
-		website: '',
-		location: '',
-	};
+
 	const [personalData, setPersonalData] = useState(initialPersonalData);
 
-	const initialSkillsData = [
-		{
-			title: '',
-			skills: [
-				{
-					skillName: '',
-				},
-			],
-		},
-	];
 	const [skillsData, setSkillsData] = useState(initialSkillsData);
 
-	const initialObjectiveData = {
-		summary: '',
-	};
 	const [objectiveData, setObjectiveData] = useState(initialObjectiveData);
-	const initialEducationData = [
-		{
-			institute: '',
-			course: '',
-			startDate: '',
-			endDate: '',
-			isCurrentlyStudying: false,
-			result: '',
-		},
-	];
+
 	const [educationData, setEducationData] = useState(initialEducationData);
 
-	const initialExperienceData = [
-		{
-			company: '',
-			title: '',
-			startDate: '',
-			endDate: '',
-			isCurrentlyWorking: false,
-			summary: '',
-		},
-	];
 	const [experienceData, setExperienceData] = useState(initialExperienceData);
 
-	const initialProjectData = [
-		{
-			title: '',
-			startDate: '',
-			endDate: '',
-			isCurrentlyWorking: false,
-			summary: '',
-		},
-	];
 	const [projectData, setProjectData] = useState(initialProjectData);
 	const [isEdit, setIsEdit] = useState(getInitialIsEdit);
-
-	//set data to db
-	async function setToDB(data, docName) {
-		data = Array.isArray(data) ? { [docName]: data } : data;
-		//if (docName === 'personalData') console.log('setdb', data);
-		try {
-			/**
-			 * The data model is as such :
-			 *  users (top collection)
-			 * 		-documents named by user ID
-			 * 			- CV-Data (subcollection)
-			 * 				-headerData
-			 * 				-personalData
-			 * 				-skillsData
-			 * 				-objectiveData
-			 * 				-educationData
-			 * 				-experienceData
-			 * 				-projectData
-			 *
-			 * The setDoc function below takes in the doc ref and the data to be set. If the doc ref doesn't exist, it will create one. {merge: true} specifies that document data will not get overwritten.
-			 */
-			await setDoc(doc(db, 'users', user.uid, 'CV-Data', docName), data, {
-				merge: true,
-			});
-		} catch (err) {
-			alert(err);
-		}
-	}
 
 	// Handling Header Data
 	const onHeaderDataChange = (e) => {
 		let { name, value } = e.target;
-		setHeaderData((prevHeaderData) => ({
-			...prevHeaderData,
-			[name]: value,
-		}));
+		setHeaderData((_) => ({ ..._, [name]: value }));
 	};
-
-	const debouncedHeaderData = useDebounce(JSON.stringify(headerData), 1000);
-
-	useEffect(() => {
-		const data = JSON.parse(debouncedHeaderData);
-		if (data.name || data.title) setToDB(data, 'headerData');
-	}, [debouncedHeaderData]);
 
 	//Handling Personal Data
 	const onPersonalDataChange = (e) => {
 		let { name, value } = e.target;
-		setPersonalData((prevPersonalData) => ({
-			...prevPersonalData,
-			[name]: value,
-		}));
+		setPersonalData((_) => ({ ..._, [name]: value }));
 	};
 
-	const debouncedPersonalData = useDebounce(JSON.stringify(personalData));
-	useEffect(() => {
-		const data = JSON.parse(debouncedPersonalData);
-		if (
-			data.gender ||
-			data.dateOfBirth ||
-			data.phone ||
-			data.email ||
-			data.website ||
-			data.location
-		) {
-			setToDB(data, 'personalData');
-		}
-	}, [debouncedPersonalData]);
-
 	//handling skillsData
-	const onSkillsDataChange = (e, skillCategoryID, skillID) => {
+	const onSkillsDataChange = (e, outerIndex, innerIndex) => {
 		let { name, value, className } = e.target;
 		let property = className === 'skills' ? className : name;
-		setSkillsData((oldSkillsData) => {
-			//console.log('from skillNames');
-			const newSkillsData = oldSkillsData.map(
-				(skillCategory, skillCategoryIndex) => {
-					if (skillCategoryIndex === skillCategoryID) {
-						//	console.log('match', value);
-						return {
-							...skillCategory,
-							[property]:
-								className === 'skills'
-									? skillCategory.skills.map((skill, skillIndex) => {
-											//	console.log(skill);
-											if (skillIndex === skillID) {
-												return {
-													...skill,
-													[name]: value,
-												};
-											}
-											return skill;
-									  })
-									: value,
-						};
-					}
-
-					//	console.log('no match');
-					return skillCategory;
-				},
-			);
-			//	console.log('newskills', newSkillsData);
+		setSkillsData((_) => {
+			const newSkillsData = _.map((_, i) => {
+				if (i === outerIndex) {
+					return {
+						..._,
+						[property]:
+							className === 'skills'
+								? _.skills.map((_, j) => {
+										if (j === innerIndex) {
+											return { ..._, [name]: value };
+										}
+										return _;
+								  })
+								: value,
+					};
+				}
+				return _;
+			});
 			return newSkillsData;
 		});
 	};
 
 	const addSkillCategory = () => {
-		setSkillsData((oldSkillsData) => [
-			...oldSkillsData,
+		setSkillsData((_) => [
+			..._,
 			{
 				title: '',
 				skills: [
@@ -248,115 +135,62 @@ function Home() {
 		]);
 	};
 
-	const deleteSkillCategory = (e, skillCategoryID) => {
-		setSkillsData((oldSkillsData) =>
-			oldSkillsData.filter(
-				(skillCategory, skillCategoryIndex) =>
-					skillCategoryIndex !== skillCategoryID,
-			),
+	const deleteSkillCategory = (e, i) => {
+		setSkillsData((_) => _.filter((_, j) => j !== i));
+	};
+
+	const addSkill = (e, index) => {
+		setSkillsData((_) =>
+			_.map((_, i) => {
+				if (i === index)
+					return {
+						..._,
+						skills: [
+							..._.skills,
+							{
+								skillName: '',
+							},
+						],
+					};
+				return _;
+			}),
 		);
 	};
 
-	const addSkill = (e, skillCategoryID) => {
-		setSkillsData((oldSkillsData) => {
-			const newSkillsData = oldSkillsData.map(
-				(skillCategory, skillCategoryIndex) => {
-					if (skillCategoryIndex === skillCategoryID)
-						//if it is the object we're dealing with
-						return {
-							...skillCategory,
-							skills: [
-								...skillCategory.skills, //copy existing skill names
-								{
-									skillName: '',
-								}, //add new skill name object
-							],
-						};
-					return skillCategory; //otherwise return back rest of the skill objects
-				},
-			);
-			//console.log(newSkillName);
+	const deleteSkill = (e, outerIndex, innerIndex) => {
+		setSkillsData((_) => {
+			const newSkillsData = _.map((_, i) => {
+				if (i === outerIndex)
+					return {
+						..._,
+						skills: _.skills.filter((_, j) => innerIndex !== j),
+					};
+				return _;
+			});
 			return newSkillsData;
 		});
 	};
-
-	const deleteSkill = (e, skillCategoryID, skillID) => {
-		setSkillsData((oldSkillsData) => {
-			const newSkillsData = oldSkillsData.map(
-				(skillCategory, skillCategoryIndex) => {
-					if (skillCategoryIndex === skillCategoryID)
-						return {
-							...skillCategory,
-							skills: skillCategory.skills.filter(
-								(skill, skillIndex) => skillID !== skillIndex,
-							),
-						};
-					return skillCategory;
-				},
-			);
-			return newSkillsData;
-		});
-	};
-
-	const debouncedSkillsData = useDebounce(JSON.stringify(skillsData), 1000);
-
-	useEffect(() => {
-		const data = JSON.parse(debouncedSkillsData);
-
-		//when there is at least one element in the array, check to see if the title of the first element is empty, if it is, then do not update the db otherwise update it.
-		/* 
-		NOTE:
-		This condition is put in place to stop the db being set to initialSkillsData object on every reload. 
-
-		BUG: 
-		So by doing this, it has become necessary for there to be a title on the first element of the array for any changes to its nested array being updated in the db.
-		So if anyone erases the title on the first skill Category, NO change will be updated to db and on reload the SAME data as before will be rendered. 
-		Also, after erasing the title on the first category, any changes made to the skills array (adding, deleting or updating the skill names) will ALSO NOT be updated to db.
-
-		Is this a bug or a feature? IDK. 
-		I guess anyone with the right mind would add the cateogory title before they start adding skill names. But if anyone does, then on reload their data will get lost :/
-		*/
-		if (data.length > 0 && data[0].title) {
-			setToDB(data, 'skillsData');
-		}
-		//if the array is empty, then update DB (this will be the case when the user removes all skill categories)
-		if (data.length === 0) {
-			setToDB(data, 'skillsData');
-		}
-	}, [debouncedSkillsData]);
 
 	// handling objective data
 	const onObjectiveDataChange = (e) => {
 		let { value } = e.target;
 		setObjectiveData({ summary: value });
 	};
-	//objective data is a string.
-	const debouncedObjectiveData = useDebounce(objectiveData, 1000);
-	useEffect(() => {
-		if (debouncedObjectiveData.summary) {
-			setToDB(debouncedObjectiveData, 'objectiveData');
-		}
-	}, [debouncedObjectiveData]);
 
-	const onEducationDataChange = (e, educationID) => {
+	const onEducationDataChange = (e, index) => {
 		let { name, value, type, checked } = e.target;
 		value = type === 'checkbox' ? checked : value;
-		setEducationData((oldEducationData) => {
-			const newEducationData = oldEducationData.map(
-				(educationItem, educationIndex) => {
-					if (educationIndex === educationID)
-						return { ...educationItem, [name]: value };
-					return educationItem;
-				},
-			);
-			//	console.log(newEducationData);
-			return newEducationData;
-		});
+		setEducationData((_) =>
+			_.map((_, i) => {
+				if (i === index) return { ..._, [name]: value };
+				return _;
+			}),
+		);
 	};
 
 	const addEducation = () => {
-		setEducationData((oldEducationData) => [
-			...oldEducationData,
+		setEducationData((_) => [
+			..._,
 			{
 				institute: '',
 				course: '',
@@ -368,49 +202,24 @@ function Home() {
 		]);
 	};
 
-	const deleteEducation = (e, educationID) => {
-		setEducationData((oldEducationData) =>
-			oldEducationData.filter(
-				(educationItem, educationIndex) => educationIndex !== educationID,
-			),
+	const deleteEducation = (e, index) => {
+		setEducationData((_) => _.filter((_, i) => i !== index));
+	};
+
+	const onExperienceDataChange = (e, index) => {
+		let { name, value, type, checked } = e.target;
+		value = type === 'checkbox' ? checked : value;
+		setExperienceData((_) =>
+			_.map((_, i) => {
+				if (i === index) return { ..._, [name]: value };
+				return _;
+			}),
 		);
 	};
 
-	const debouncedEducationData = useDebounce(
-		JSON.stringify(educationData),
-		1000,
-	);
-
-	useEffect(() => {
-		const data = JSON.parse(debouncedEducationData);
-
-		if (data.length > 0 && data[0].institute) {
-			setToDB(data, 'educationData');
-		}
-		//if the array is empty, then update DB (this will be the case when the user removes all education sections)
-		if (data.length === 0) {
-			setToDB(data, 'educationData');
-		}
-	}, [debouncedEducationData]);
-
-	const onExperienceDataChange = (e, experienceID) => {
-		let { name, value, type, checked } = e.target;
-		value = type === 'checkbox' ? checked : value;
-		setExperienceData((oldExperienceData) => {
-			const newExperienceData = oldExperienceData.map(
-				(experienceItem, experienceIndex) => {
-					if (experienceIndex === experienceID)
-						return { ...experienceItem, [name]: value };
-					return experienceItem;
-				},
-			);
-			return newExperienceData;
-		});
-	};
-
 	const addExperience = () => {
-		setExperienceData((oldExperienceData) => [
-			...oldExperienceData,
+		setExperienceData((_) => [
+			..._,
 			{
 				company: '',
 				title: '',
@@ -422,47 +231,24 @@ function Home() {
 		]);
 	};
 
-	const deleteExperience = (e, experienceID) => {
-		setExperienceData((oldExperienceData) =>
-			oldExperienceData.filter(
-				(experienceItem, experienceIndex) => experienceIndex !== experienceID,
-			),
+	const deleteExperience = (e, index) => {
+		setExperienceData((_) => _.filter((_, i) => i !== index));
+	};
+
+	const onProjectDataChange = (e, index) => {
+		let { name, value, type, checked } = e.target;
+		value = type === 'checkbox' ? checked : value;
+		setProjectData((_) =>
+			_.map((_, i) => {
+				if (i === index) return { ..._, [name]: value };
+				return _;
+			}),
 		);
 	};
 
-	const debouncedExperienceData = useDebounce(
-		JSON.stringify(experienceData),
-		1000,
-	);
-
-	useEffect(() => {
-		const data = JSON.parse(debouncedExperienceData);
-
-		if (data.length > 0 && data[0].title) {
-			setToDB(data, 'experienceData');
-		}
-		//if the array is empty, then update DB (this will be the case when the user removes all education sections)
-		if (data.length === 0) {
-			setToDB(data, 'experienceData');
-		}
-	}, [debouncedExperienceData]);
-
-	const onProjectDataChange = (e, projectID) => {
-		let { name, value, type, checked } = e.target;
-		value = type === 'checkbox' ? checked : value;
-		setProjectData((oldProjectData) => {
-			const newProjectData = oldProjectData.map((projectItem, projectIndex) => {
-				if (projectIndex === projectID)
-					return { ...projectItem, [name]: value };
-				return projectItem;
-			});
-			return newProjectData;
-		});
-	};
-
 	const addProject = () => {
-		setProjectData((oldProjectData) => [
-			...oldProjectData,
+		setProjectData((_) => [
+			..._,
 			{
 				title: '',
 				startDate: '',
@@ -473,27 +259,9 @@ function Home() {
 		]);
 	};
 
-	const deleteProject = (e, projectID) => {
-		setProjectData((oldProjectData) =>
-			oldProjectData.filter(
-				(projectItem, projectIndex) => projectIndex !== projectID,
-			),
-		);
+	const deleteProject = (e, index) => {
+		setProjectData((_) => _.filter((_, i) => i !== index));
 	};
-
-	const debouncedProjectData = useDebounce(JSON.stringify(projectData), 1000);
-
-	useEffect(() => {
-		const data = JSON.parse(debouncedProjectData);
-
-		if (data.length > 0 && data[0].title) {
-			setToDB(data, 'projectData');
-		}
-		//if the array is empty, then update DB (this will be the case when the user removes all education sections)
-		if (data.length === 0) {
-			setToDB(data, 'projectData');
-		}
-	}, [debouncedProjectData]);
 
 	// for CV- toggle
 	const submitHandler = (e) => {
@@ -503,6 +271,7 @@ function Home() {
 	const editHandler = () => {
 		setIsEdit(true);
 	};
+
 	useEffect(() => {
 		localStorage.setItem('isEdit', JSON.stringify(isEdit));
 	}, [isEdit]);
@@ -522,71 +291,63 @@ function Home() {
 
 	//for printing page as pdf
 	const printPage = () => window.print();
-	//logout
-	const handleLogOut = async () => {
-		try {
-			await logOut();
-		} catch (err) {
-			alert(err);
-		}
-	};
+
 	return (
-		<div className='cv-wrapper'>
-			<div className='toggle-btns-wrapper'>
-				<button onClick={editHandler} className='btn-cv-toggle'>
-					Edit
-				</button>
-				<button onClick={submitHandler} className='btn-cv-toggle'>
-					Preview
-				</button>
-				{!isEdit && (
-					<button onClick={printPage} className='btn-cv-toggle'>
-						Print
+		<>
+			<div className='cv-wrapper'>
+				<div className='toggle-btns-wrapper'>
+					<button onClick={editHandler} className='btn-cv-toggle'>
+						Edit
 					</button>
+					<button onClick={submitHandler} className='btn-cv-toggle'>
+						Preview
+					</button>
+					{!isEdit && (
+						<button onClick={printPage} className='btn-cv-toggle'>
+							Print
+						</button>
+					)}
+				</div>
+				{isEdit ? (
+					<EditableCV
+						headerData={headerData}
+						personalData={personalData}
+						skillsData={skillsData}
+						objectiveData={objectiveData}
+						educationData={educationData}
+						experienceData={experienceData}
+						projectData={projectData}
+						onHeaderDataChange={onHeaderDataChange}
+						onPersonalDataChange={onPersonalDataChange}
+						onSkillsDataChange={onSkillsDataChange}
+						addSkillCategory={addSkillCategory}
+						deleteSkillCategory={deleteSkillCategory}
+						addSkill={addSkill}
+						deleteSkill={deleteSkill}
+						onObjectiveDataChange={onObjectiveDataChange}
+						onEducationDataChange={onEducationDataChange}
+						addEducation={addEducation}
+						deleteEducation={deleteEducation}
+						onExperienceDataChange={onExperienceDataChange}
+						addExperience={addExperience}
+						deleteExperience={deleteExperience}
+						onProjectDataChange={onProjectDataChange}
+						addProject={addProject}
+						deleteProject={deleteProject}
+					/>
+				) : (
+					<PreviewCV
+						headerData={headerData}
+						personalData={personalData}
+						skillsData={skillsData}
+						objectiveData={objectiveData}
+						educationData={educationData}
+						experienceData={experienceData}
+						projectData={projectData}
+					/>
 				)}
-				<button onClick={handleLogOut} className='btn-cv-toggle'>
-					Log Out
-				</button>
 			</div>
-			{isEdit ? (
-				<EditableCV
-					headerData={headerData}
-					personalData={personalData}
-					skillsData={skillsData}
-					objectiveData={objectiveData}
-					educationData={educationData}
-					experienceData={experienceData}
-					projectData={projectData}
-					onHeaderDataChange={onHeaderDataChange}
-					onPersonalDataChange={onPersonalDataChange}
-					onSkillsDataChange={onSkillsDataChange}
-					addSkillCategory={addSkillCategory}
-					deleteSkillCategory={deleteSkillCategory}
-					addSkill={addSkill}
-					deleteSkill={deleteSkill}
-					onObjectiveDataChange={onObjectiveDataChange}
-					onEducationDataChange={onEducationDataChange}
-					addEducation={addEducation}
-					deleteEducation={deleteEducation}
-					onExperienceDataChange={onExperienceDataChange}
-					addExperience={addExperience}
-					deleteExperience={deleteExperience}
-					onProjectDataChange={onProjectDataChange}
-					addProject={addProject}
-					deleteProject={deleteProject}
-				/>
-			) : (
-				<PreviewCV
-					headerData={headerData}
-					personalData={personalData}
-					skillsData={skillsData}
-					objectiveData={objectiveData}
-					educationData={educationData}
-					experienceData={experienceData}
-					projectData={projectData}
-				/>
-			)}
-		</div>
+		</>
 	);
 }
 
